@@ -2,70 +2,72 @@ package get
 
 import (
 	"encoding/xml"
-	"errors"
+	"fmt"
 	"io/ioutil"
-	"sync"
+	"net/http"
+	"os"
+
+	"github.com/gorilla/mux"
 )
 
 // helper
-type IData interface {
-	Set(
-		name string,
-		city string,
-	)
+
+type Students struct {
+	XMLName     xml.Name  `xml:"students"`
+	StudentList []Student `xml:"student"`
 }
 
-type SData struct {
-	name string
-	city string
+type Student struct {
+	XMLName   xml.Name `xml:"student"`
+	Firstname string   `xml:"type,attr"`
+	Lastname  string   `xml:"type,attr"`
+	City      string   `xml:"type,attr"`
 }
 
-// store to db
-
-type SStore struct {
-	db map[string]string
-	m  sync.Mutex
-}
-
-func (data *SStore) Set(name string, city string) {
-	data.m.Lock()
-	defer data.m.Unlock()
-
-	if data.db == nil {
-		data.db = make(map[string]string)
-	}
-	data.db[name] = city
-}
-
-func (data *SStore) GetStudents(name string) (string, error) {
-	data.m.Lock()
-	defer data.m.Unlock()
-
-	okStatus := data.db
-	st := data.db[name]
-
-	if okStatus == nil {
-		return "Error: ", errors.New("not Found")
-	}
-
-	return st, nil
-}
-
-func (data *SStore) Save() error {
-
-	body, err := xml.Marshal(data.db)
+func getStudents() {
+	xmlFile, err := os.Open("db.xml")
 
 	if err != nil {
-		return err
+		fmt.Println(err)
 	}
 
-	file, err := xml.MarshalIndent(body, "  ", "    ")
+	defer xmlFile.Close()
+
+	byteValue, _ := ioutil.ReadAll(xmlFile)
+
+	var students Students
+
+	xml.Unmarshal(byteValue, &students)
+
+	for i := 0; i < len(students.StudentList); i++ {
+		fmt.Println("Firstname: " + students.StudentList[i].Firstname)
+		fmt.Println("Lastname: " + students.StudentList[i].Lastname)
+		fmt.Println("City: " + students.StudentList[i].City)
+	}
+}
+
+func getCities(r *http.Request) {
+
+	params := mux.Vars(r)
+
+	xmlFile, err := os.Open("db.xml")
 
 	if err != nil {
-		return err
+		fmt.Println(err)
 	}
 
-	_ = ioutil.WriteFile("db.xml", file, 0644)
+	defer xmlFile.Close()
 
-	return nil
+	byteValue, _ := ioutil.ReadAll(xmlFile)
+
+	var students Students
+
+	xml.Unmarshal(byteValue, &students)
+
+	for i := 0; i < len(students.StudentList); i++ {
+		if students.StudentList[i].Firstname == params["firstname"] {
+			fmt.Println("City: " + students.StudentList[i].City)
+		}
+
+	}
 }

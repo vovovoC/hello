@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<students>
+  <student>
+    <firstname>Anna</firstname>
+    <lastname>Pav</lastname>
+    <city>Almaty</city>
+  </student>
+  <student>
+    <firstname>Jane</firstname>
+    <lastname>Li</lastname>
+    <city>Almaty</city>
+  </student>
+</students>
