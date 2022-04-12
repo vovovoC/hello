@@ -1,9 +1,9 @@
 package main
 
 import (
-	get "./pkg/get"
-	put "./pkg/put"
 	"github.com/gorilla/mux"
+	"github.com/vovovoC/hello/pkg/get"
+	"github.com/vovovoC/hello/pkg/put"
 )
 
 func main() {

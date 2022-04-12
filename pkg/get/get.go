@@ -1,4 +1,4 @@
-package pkg
+package get
 
 import (
 	"encoding/xml"
